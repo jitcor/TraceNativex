@@ -26,3 +26,6 @@
 - method_match_enable 是否启用函数过滤
 - method_match 函数名匹配规则
 > 其中 openssl::aes::* 规则需要先开启 cpp_demangle ,才能生效  
+
+# 加入我的知识圈
+[Humenger](https://github.com/Humenger)
