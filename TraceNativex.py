@@ -14,13 +14,17 @@ import time
 import os
 import re
 import ida_kernwin
+import pydevd_pycharm
+pydevd_pycharm.settrace('localhost', port=5070, stdoutToServer=True, stderrToServer=True)
+
 
 def_config_json = """
 {
-  "method_match_enable":false,
   "ignore_case":false,
   "cpp_demangle":false,
   "print_log":false,
+  "reserve_symbol":false,
+  "method_match_enable":false,
   "method_match":[
       "sub_*",
       "Java_*",
@@ -30,7 +34,7 @@ def_config_json = """
   ]
 }
 """
-config_file_path = os.path.dirname(__file__) + "/TraceNativex_v4.config"
+config_file_path = os.path.dirname(__file__) + "/TraceNativex_v5.config"
 
 
 class EditConfigFileAlert(ida_kernwin.Form):
@@ -157,6 +161,7 @@ class TraceNativex(plugin_t):
         method_match = config['method_match']
         cpp_demangle = config['cpp_demangle']
         print_log = config['print_log']
+        reserve_symbol = config['reserve_symbol']
         print(method_match_enable)
         print(ignore_case)
         if cpp_demangle:
@@ -165,6 +170,7 @@ class TraceNativex(plugin_t):
         # 查找需要的函数
         ea, ed = getSegAddr()
         search_result = []
+        search_func_result = []
         for func in idautils.Functions(ea, ed):
             try:
                 functionName = str(idaapi.ida_funcs.get_func_name(func))
@@ -183,7 +189,9 @@ class TraceNativex(plugin_t):
                     if is_match:
                         if print_log:
                             print("Trace func:", functionName)
-                        if len(list(idautils.FuncItems(func))) > 10:
+                        if reserve_symbol and not functionName.startswith("sub_"):
+                                search_func_result.append(functionName)
+                        elif len(list(idautils.FuncItems(func))) > 10:# 函数指令条数大于10
                             # 如果是thumb模式，地址+1
                             arm_or_thumb = idc.get_sreg(func, "T")
                             if arm_or_thumb:
@@ -193,13 +201,17 @@ class TraceNativex(plugin_t):
                 print(e)
 
         so_path, so_name = getSoPathAndName()
+        script_name = so_name.split(".")[0] + "_" + str(int(time.time())) + ".txt"
+        save_path = os.path.join(so_path, script_name)
+        if reserve_symbol:
+            search_func_result = [f"-i '{so_name}!{func}'" for func in search_func_result]
+        search_func_result = " ".join(search_func_result)
+
         search_result = [f"-a '{so_name}!{offset}'" for offset in search_result]
         search_result = " ".join(search_result)
 
-        script_name = so_name.split(".")[0] + "_" + str(int(time.time())) + ".txt"
-        save_path = os.path.join(so_path, script_name)
         with open(save_path, "w", encoding="utf-8") as F:
-            F.write(search_result)
+            F.write(search_func_result+" "+search_result)
 
         print("使用方法如下：")
         print(f"frida-trace -UF -O {save_path}")
@@ -210,3 +222,5 @@ class TraceNativex(plugin_t):
 
 def PLUGIN_ENTRY():
     return TraceNativex()
+
+# PLUGIN_ENTRY().run(None)
