@@ -14,8 +14,8 @@ import time
 import os
 import re
 import ida_kernwin
-import pydevd_pycharm
-pydevd_pycharm.settrace('localhost', port=5070, stdoutToServer=True, stderrToServer=True)
+#import pydevd_pycharm
+#pydevd_pycharm.settrace('localhost', port=5070, stdoutToServer=True, stderrToServer=True)
 
 
 def_config_json = """
