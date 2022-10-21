@@ -1,7 +1,7 @@
 # TraceNativex
 支持c++ 函数名按原始函数名过滤，以及其他一些小功能
 # 安装
-跟traceNatives一样放入IDA 插件目录即可  
+跟traceNatives一样放入IDA 插件目录即可，只不过多了一个demumble.exe文件    
 # 配置文件说明
 ```json
 {
