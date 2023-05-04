@@ -14,7 +14,7 @@ import time
 import os
 import re
 import ida_kernwin
-#import pydevd_pycharm
+import pydevd_pycharm
 #pydevd_pycharm.settrace('localhost', port=5070, stdoutToServer=True, stderrToServer=True)
 
 
@@ -93,13 +93,12 @@ def getSoPathAndName():
 def getSegAddr():
     textStart = []
     textEnd = []
-
     for seg in idautils.Segments():
         if (idc.get_segm_name(seg)).lower() == '.text' or (
-                idc.get_segm_name(seg)).lower() == 'text':
+                idc.get_segm_name(seg)).lower() == 'text' or(
+                idc.get_segm_name(seg)).lower()=='__text':
             tempStart = idc.get_segm_start(seg)
             tempEnd = idc.get_segm_end(seg)
-
             textStart.append(tempStart)
             textEnd.append(tempEnd)
 
