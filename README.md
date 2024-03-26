@@ -44,6 +44,33 @@ if __name__ == '__main__':
       print(key,"->",counts[key])
 
 ```
+- chatGPT给的方案
+```python
+import re
+
+text = open(r"F:\task\wechat\7.0.20\data\lib\arm64-v8a\libwechatmm_1711448001.txt.log","rb").read().decode()
+
+# 使用正则表达式匹配以"sub_"开头的子函数标识符
+sub_functions = re.findall(r'sub_[a-fA-F0-9]+', text)
+
+# 创建一个空字典来存储每个子函数及其出现次数
+sub_function_counts = {}
+
+# 遍历子函数列表，统计每个子函数的出现次数
+for sub_function in sub_functions:
+    if sub_function in sub_function_counts:
+        sub_function_counts[sub_function] += 1
+    else:
+        sub_function_counts[sub_function] = 1
+
+# 按出现次数从大到小对子函数进行排序
+sorted_sub_functions = sorted(sub_function_counts.items(), key=lambda x: x[1], reverse=True)
+
+# 打印排序后的结果
+for sub_function, count in sorted_sub_functions:
+    print(f"{sub_function}: {count}")
+
+```
 ### 效果图
 ![image](https://user-images.githubusercontent.com/27600008/197162604-301ca235-e815-4464-9a5b-536408e468cf.png)
 
